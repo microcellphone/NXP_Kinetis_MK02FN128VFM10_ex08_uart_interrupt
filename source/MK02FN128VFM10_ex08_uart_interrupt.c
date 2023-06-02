@@ -96,7 +96,7 @@ void UART0_SERIAL_RX_TX_IRQHANDLER(void) {
   /* Place your code here */
   /* If new data arrived. */
   if ((kUART_RxDataRegFullFlag | kUART_RxOverrunFlag) & intStatus) {
-      data = UART_ReadByte(UART0);
+      data = UART_ReadByte(UART0_PERIPHERAL);
 
       /* If ring buffer is not full, add data to ring buffer. */
       if (((rxIndex + 1) % DEMO_RING_BUFFER_SIZE) != txIndex) {
@@ -128,10 +128,10 @@ int main(void) {
 #endif
 
     /* Send g_tipString out. */
-    UART_WriteBlocking(UART0, g_tipString, sizeof(g_tipString) / sizeof(g_tipString[0]));
+    UART_WriteBlocking(UART0_PERIPHERAL, g_tipString, sizeof(g_tipString) / sizeof(g_tipString[0]));
 
     /* Enable RX interrupt. */
-    UART_EnableInterrupts(UART0, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
+    UART_EnableInterrupts(UART0_PERIPHERAL, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
     EnableIRQ(UART0_RX_TX_IRQn);
 
     /* Force the counter to be placed into memory. */
@@ -139,8 +139,8 @@ int main(void) {
     /* Enter an infinite loop, just incrementing a counter. */
     while(1) {
         /* Send data only when UART TX register is empty and ring buffer has data to send out. */
-        while ((kUART_TxDataRegEmptyFlag & UART_GetStatusFlags(UART0)) && (rxIndex != txIndex)) {
-            UART_WriteByte(UART0, demoRingBuffer[txIndex]);
+        while ((kUART_TxDataRegEmptyFlag & UART_GetStatusFlags(UART0_PERIPHERAL)) && (rxIndex != txIndex)) {
+            UART_WriteByte(UART0_PERIPHERAL, demoRingBuffer[txIndex]);
             txIndex++;
             txIndex %= DEMO_RING_BUFFER_SIZE;
         }
